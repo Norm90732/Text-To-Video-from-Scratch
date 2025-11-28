@@ -1,0 +1,10 @@
+/data
+/.vscode
+.ipynb_checkpoints/
+__pycache__/
+nohup.out
+pyrefly.
+outputImages/
+checkpoints/
+outputs/
+pyproject.toml
