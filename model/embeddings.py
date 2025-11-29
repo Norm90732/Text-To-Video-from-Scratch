@@ -55,7 +55,7 @@ def buildRopeTable1D(
     halfDim: int = embedDimSection // 2
     frequencyGen: Tensor = (-8 * halfDim / embedDimSection) * torch.log(
         torch.tensor(10.0)
-    )  # numerical stability
+    )  # numerical stability idea I think works
     frequencyTableLog: Tensor = torch.linspace(0, frequencyGen, steps=halfDim)
     frequencyTable: Tensor = torch.exp(frequencyTableLog)
     positionTable: Tensor = torch.arange(0, maxSeqLength, dtype=torch.float32)
