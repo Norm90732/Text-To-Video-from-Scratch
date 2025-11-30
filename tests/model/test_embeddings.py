@@ -30,14 +30,12 @@ def test_tubeletPatchingShape() -> None:
 
 
 def test_buildRopeTable1D() -> None:
-    embedDim: int = 8
-    maxSeqLength: int = 10
+    headDim: int = 64
+    maxSeqLength: int = 300
 
-    halfDim: int = embedDim // 2
+    halfDim: int = headDim // 2
 
-    angleTable: Tensor = buildRopeTable1D(
-        embedDimSection=embedDim, maxSeqLength=maxSeqLength
-    )
+    angleTable: Tensor = buildRopeTable1D(headDim=headDim, maxSeqLength=maxSeqLength)
 
     result: Tensor = torch.randn(maxSeqLength, halfDim)
 
@@ -48,11 +46,11 @@ def test_applyRope3D() -> None:
     t = 4
     h = 5
     w = 10
-    embedDim = 300
-    layer: Tensor = create3DFrequencyTable3D(t=t, h=h, w=w, embedDim=embedDim)
+    headDim = 64
+    layer: Tensor = create3DFrequencyTable3D(t=t, h=h, w=w, headDim=headDim)
 
     targetSeqLen = t * h * w
-    target: Tensor = torch.randn(1, targetSeqLen, embedDim // 2)
+    target: Tensor = torch.randn(targetSeqLen, headDim // 2)
 
     assert layer.shape == target.shape
 
@@ -62,9 +60,10 @@ def test_ThreeDRope():
     t = 16
     h = 400
     w = 300
-    embedDim = 900
-    ropeModel = ThreeDRope(t=t, h=h, w=w, embedDim=embedDim)
-    videoTensor: Tensor = torch.randn(1, t * h * w, embedDim)
+    headDim = 64
+    numHeads = 4
+    ropeModel = ThreeDRope(t=t, h=h, w=w, headDim=headDim)
+    videoTensor: Tensor = torch.randn(1, t * h * w, numHeads, headDim)
     output: Tensor = ropeModel.forward(videoTensor)
 
     assert output.shape == videoTensor.shape, "Shapes do not match"
@@ -73,9 +72,10 @@ def test_ThreeDRope():
     t = 4
     h = 5
     w = 10
-    embedDim = 300
-    ropeModel = ThreeDRope(t=t, h=h, w=w, embedDim=embedDim)
-    videoTensor: Tensor = torch.randn(1, t * h * w, embedDim)
+    headDim = 64
+    numHeads = 4
+    ropeModel = ThreeDRope(t=t, h=h, w=w, headDim=headDim)
+    videoTensor: Tensor = torch.randn(1, t * h * w, numHeads, headDim)
     output: Tensor = ropeModel.forward(videoTensor)
     result = (videoTensor[0, 0, :] - output[0, 0, :]).abs().sum()
     assert result < 1e-5, "Difference in first postion is greater than 1e-5"
@@ -84,9 +84,10 @@ def test_ThreeDRope():
     t = 15
     h = 80
     w = 120
-    embedDim = 3072
-    ropeModel = ThreeDRope(t=t, h=h, w=w, embedDim=embedDim)
-    videoTensor: Tensor = torch.randn(1, t * h * w, embedDim)
+    headDim = 256
+    numHeads = 12
+    ropeModel = ThreeDRope(t=t, h=h, w=w, headDim=headDim)
+    videoTensor: Tensor = torch.randn(1, t * h * w, numHeads, headDim)
     output: Tensor = ropeModel.forward(videoTensor)
     # Per Token Norm
     inputTokenNorm = videoTensor.norm(p=2, dim=-1)

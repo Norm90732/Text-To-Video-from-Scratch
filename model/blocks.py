@@ -14,7 +14,7 @@ class TimeStepEmbedding(nn.Module):
         self.halfDim: int = embedDim // 2
         i: Tensor = torch.arange(0, self.halfDim, step=1, dtype=torch.float32)
         invFrequencies: Tensor = 10000 ** ((-2 * i) / embedDim)
-        self.register_buffer("invFreqCache", invFrequencies)
+        self.register_buffer("invFreqCache", invFrequencies, persistent=False)
         # B, embedDim//2
 
     @jaxtyped(typechecker=beartype)
